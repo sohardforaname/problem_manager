@@ -14,4 +14,6 @@ then you can input commands appending ">>>"
 
 the legal commands are listed below:
 
-> 
+> -a
+
+add a problem
