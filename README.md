@@ -22,7 +22,7 @@ You can query more than one problem like the example.
 
 Example:
 
-'''
+'''cpp
 >>> -a
 test1 4 t1 t2 t3 t4
 test2 2 t1 t2
@@ -37,7 +37,7 @@ You can query more than one problem.
 
 Example:
 
-'''
+'''cpp
 >>> -q -p
 test1
 test2
@@ -50,7 +50,7 @@ Query the problems by tag, more than one tag is supported, it follows logical or
 
 Example:
 
-'''
+'''cpp
 >>> -q -c
 t1
 t2
@@ -63,7 +63,7 @@ Delete problems by name. More than one tag is supported.
 
 Example:
 
-'''
+'''cpp
 >>> -d -p
 test1
 test2
@@ -76,7 +76,7 @@ Delete problems by tag. More than one tag is supported. It follows logical or.
 
 Example:
 
-'''
+'''cpp
 >>> -d -c
 t1
 t2
@@ -89,7 +89,7 @@ Save the change.
 
 Example:
 
-'''
+'''cpp
 >>> -s
 '''
 
@@ -99,7 +99,7 @@ Clear the buffer.
 
 Example:
 
-'''
+'''cpp
 >>> -c
 '''
 
@@ -109,6 +109,6 @@ Exit the program.
 
 Example:
 
-'''
+'''cpp
 >>> -e
 '''
