@@ -104,6 +104,15 @@ void Manager::list_cata()
 		std::cout << "total items: " << dat.second.size() << "\n";
 	}	
 }
+void Manager::list()
+{
+	std::string op;
+	std::cin >> op;
+	if (op == "-p")
+		list_pro();
+	else if (op == "-c")
+		list_cata();
+}
 void Manager::clear()
 {
 	std::string pro;
