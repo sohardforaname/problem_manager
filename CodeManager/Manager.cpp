@@ -33,7 +33,6 @@ void Manager::query_pro()
 		}
 	}
 }
-
 bool find_com(std::set<std::string>& a, std::set<std::string>& b)
 {
 	auto it1 = a.begin(), it2 = b.begin();
