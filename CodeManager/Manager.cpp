@@ -202,7 +202,7 @@ Manager::Manager()
 	func_mp["-a"] = &Manager::add_pro;
 	func_mp["-q"] = &Manager::query;
 	func_mp["-d"] = &Manager::del;
-	func_mp["-l"] = &Manager::list_pro;
+	func_mp["-l"] = &Manager::list;
 	func_mp["-c"] = &Manager::clear;
 	func_mp["-s"] = &Manager::save_pro;
 }
