@@ -78,13 +78,32 @@ void Manager::query()
 }
 void Manager::list_pro()
 {
+	int cnt = 0;
 	for (auto& str : mp)
 	{
-		std::cout << str.first << "\nkind:";
+		std::cout << str.first << "\ntag:";
 		for (auto& sstr : str.second)
+		{
 			std::cout << " " << sstr;
+			++cnt;
+		}
 		std::cout << "\n";
 	}
+	std::cout << "total items: " << cnt << "\n";
+}
+void Manager::list_cata()
+{
+	std::unordered_map<std::string, std::set<std::string>>tmp_mp;
+	for (auto &dat : mp)
+		for (auto& str : dat.second)
+			tmp_mp[str].insert(dat.first);
+	for (auto& dat : tmp_mp)
+	{
+		std::cout << dat.first << "\n";
+		for (auto& str : dat.second)
+			std::cout << "\t" << str << "\n";
+		std::cout << "total items: " << dat.second.size() << "\n";
+	}	
 }
 void Manager::clear()
 {
@@ -169,6 +188,8 @@ void Manager::init_mp()
 }
 Manager::Manager()
 {
+	std::ios::sync_with_stdio(0);
+	std::cin.tie(0);
 	init_mp();
 	func_mp["-a"] = &Manager::add_pro;
 	func_mp["-q"] = &Manager::query;

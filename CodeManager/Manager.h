@@ -18,6 +18,7 @@ private:
 	void query_cata();
 	void query();
 	void list_pro();
+	void list_cata();
 	void clear();
 	void save_pro();
 	void del_pro();
