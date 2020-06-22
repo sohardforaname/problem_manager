@@ -10,23 +10,23 @@
 class Manager
 {
 private:
-	std::unordered_map<std::string, std::set<std::string>>mp;
-	std::unordered_map<std::string, void(Manager::*)(void)> func_mp;
-	void init_mp();
-	void add_pro();
-	void query_pro();
-	void query_cata();
-	void query();
-	void list_pro();
-	void list_cata();
-	void list();
-	void clear();
-	void save_pro();
-	void del_pro();
-	void del_cata();
-	void del();
+	std::unordered_map<std::string, std::set<std::string>>problemList;
+	std::unordered_map<std::string, void(Manager::*)(void)> functionMap;
+	void initFunctionMap();
+	void AddProblem();
+	void QueryProblem();
+	void QueryCatelogue();
+	void Query();
+	void ListProblem();
+	void listCatelogue();
+	void List();
+	void Clear();
+	void SaveProblemList();
+	void DeleteProblem();
+	void DeleteCatelogue();
+	void Delete();
 
 public:
 	Manager();
-	void call_func(std::string& op);
+	void CallFunction(std::string& operation);
 };

@@ -1,13 +1,13 @@
 #include "Manager.h"
 int main()
 {
-	Manager m;
-	std::string op;
-	while (op != "-e")
+	Manager manager;
+	std::string operation;
+	while (operation != "-e")
 	{
 		std::cout << ">>> ";
-		std::cin >> op;
-		m.call_func(op);
+		std::cin >> operation;
+		manager.CallFunction(operation);
 	}
 	return 0;
 }

@@ -1,42 +1,9 @@
 #include "Manager.h"
-void Manager::add_pro()
+
+bool find_com(std::set<std::string>& firstSet, std::set<std::string>& secondSet)
 {
-	std::string pro, lst;
-	int cata_cnt;
-	while (std::cin >> pro && pro != "end")
-	{
-		std::cin >> cata_cnt;
-		mp[pro] = std::set<std::string>();
-		while (cata_cnt--)
-		{
-			std::cin >> lst;
-			mp[pro].insert(lst);
-		}
-	}
-}
-void Manager::query_pro()
-{
-	std::string lst, tmp;
-	std::set<std::string> pro_lst;
-	while (std::cin >> lst && lst != "end")
-		pro_lst.insert(lst);
-	std::cout << "searching...\n";
-	for (auto& str : pro_lst)
-	{
-		auto it = mp.find(str);
-		if (it != mp.end())
-		{
-			std::cout << (*it).first << "\ntag:";
-			for (auto& sstr : (*it).second)
-				std::cout << " " << sstr;
-			std::cout << "\n";
-		}
-	}
-}
-bool find_com(std::set<std::string>& a, std::set<std::string>& b)
-{
-	auto it1 = a.begin(), it2 = b.begin();
-	while (it1 != a.end() && it2 != b.end())
+	auto it1 = firstSet.begin(), it2 = secondSet.begin();
+	while (it1 != firstSet.end() && it2 != secondSet.end())
 	{
 		if (*it1 < *it2)
 			++it1;
@@ -47,56 +14,99 @@ bool find_com(std::set<std::string>& a, std::set<std::string>& b)
 	}
 	return false;
 }
-void Manager::query_cata()
+
+void Manager::AddProblem()
 {
-	int cnt = 0;
-	std::string lst;
-	std::set<std::string>tag_lst;
-	while (std::cin >> lst && lst != "end")
-		tag_lst.insert(lst);
+	std::string problem, tagList;
+	int catalogueCounter;
+	while (std::cin >> problem && problem != "end")
+	{
+		std::cin >> catalogueCounter;
+		problemList[problem] = std::set<std::string>();
+		while (catalogueCounter--)
+		{
+			std::cin >> tagList;
+			problemList[problem].insert(tagList);
+		}
+	}
+}
+
+void Manager::QueryProblem()
+{
+	std::string tmpProblemName;
+	std::set<std::string> tmpProblemList;
+	while (std::cin >> tmpProblemName && tmpProblemName != "end")
+		tmpProblemList.insert(tmpProblemName);
 	std::cout << "searching...\n";
-	for (auto& str : mp)
-		if (find_com(tag_lst, str.second))
+	int findCounter = 0;
+	for (auto& str : tmpProblemList)
+	{
+		auto it = problemList.find(str);
+		if (it != problemList.end())
+		{
+			++findCounter;
+			std::cout << (*it).first << "\ntag:";
+			for (auto& sstr : (*it).second)
+				std::cout << " " << sstr;
+			std::cout << "\n";
+		}
+	}
+	std::cout << "total items: " << findCounter << "\n";
+}
+
+void Manager::QueryCatelogue()
+{
+	int findCounter = 0;
+	std::string tmpTag;
+	std::set<std::string> tmpTagList; 
+	while (std::cin >> tmpTag && tmpTag != "end")
+		tmpTagList.insert(tmpTag);
+	std::cout << "searching...\n";
+	for (auto& str : problemList)
+		if (find_com(tmpTagList, str.second))
 		{
 			std::cout << str.first << "\ntag:";
 			for (auto& sstr : str.second)
 				std::cout << " " << sstr;
 			std::cout << "\n";
-			++cnt;
+			++findCounter;
 		}
-	std::cout << "total items: " << cnt << "\n";
+	std::cout << "total items: " << findCounter << "\n";
 }
-void Manager::query()
+
+void Manager::Query()
 {
-	std::string op;
-	std::cin >> op;
-	if (op == "-p")
-		query_pro();
-	else if (op == "-c")
-		query_cata();
+	std::string operation;
+	std::cin >> operation;
+	if (operation == "-p")
+		QueryProblem();
+	else if (operation == "-c")
+		QueryCatelogue();
 }
-void Manager::list_pro()
+
+void Manager::ListProblem()
 {
-	int cnt = 0;
-	for (auto& str : mp)
+	int findCounter= 0;
+	for (auto& str : problemList)
 	{
 		std::cout << str.first << "\ntag:";
 		for (auto& sstr : str.second)
 		{
 			std::cout << " " << sstr;
-			++cnt;
+			++findCounter;
 		}
 		std::cout << "\n";
 	}
-	std::cout << "total items: " << cnt << "\n";
+	std::cout << "total items: " << findCounter << "\n";
 }
-void Manager::list_cata()
+
+void Manager::listCatelogue()
 {
-	std::unordered_map<std::string, std::set<std::string>>tmp_mp;
-	for (auto &dat : mp)
+	std::unordered_map<std::string, std::set<std::string>>tmpProblemList;
+	for (auto &dat : problemList)
 		for (auto& str : dat.second)
-			tmp_mp[str].insert(dat.first);
-	for (auto& dat : tmp_mp)
+			tmpProblemList[str].insert(dat.first);
+	for (auto& dat : tmpProblemList)
 	{
 		std::cout << dat.first << "\n";
 		for (auto& str : dat.second)
@@ -104,113 +114,126 @@ void Manager::list_cata()
 		std::cout << "total items: " << dat.second.size() << "\n";
 	}	
 }
-void Manager::list()
+
+void Manager::List()
 {
-	std::string op;
-	std::cin >> op;
-	if (op == "-p")
-		list_pro();
-	else if (op == "-c")
-		list_cata();
+	std::string operation;
+	std::cin >> operation;
+	if (operation == "-p")
+		ListProblem();
+	else if (operation == "-c")
+		listCatelogue();
 }
-void Manager::clear()
+
+void Manager::Clear()
 {
-	std::string pro;
+	std::string operationCheck;
 	std::cout << "please check y/n: ";
-	std::cin >> pro;
-	if (pro == "y")
+	std::cin >> operationCheck;
+	if (operationCheck == "y")
 	{
-		mp.clear();
+		problemList.clear();
 		std::cout << "cleared\n";
 	}
 }
-void Manager::save_pro()
+
+void Manager::SaveProblemList()
 {
-	std::fstream file_ptr("D:\\problemdata\\problemdata.txt", std::ios::out);
-	for (auto& str : mp)
+	std::fstream filePointer("D:\\problemdata\\problemdata.txt", std::ios::out);
+	for (auto& str : problemList)
 	{
-		file_ptr << str.first;
-		file_ptr << " " << str.second.size();
+		filePointer << str.first;
+		filePointer << " " << str.second.size();
 		for (auto& sstr : str.second)
-			file_ptr << " " << sstr;
-		file_ptr << "\n";
+			filePointer << " " << sstr;
+		filePointer << "\n";
 	}
-	file_ptr.close();
+	filePointer.close();
 	std::cout << "save ok!\n";
 }
-void Manager::del_pro()
+
+void Manager::DeleteProblem()
 {
-	std::string lst;
-	std::set<std::string> pro_lst;
-	while (std::cin >> lst && lst != "end")
-		pro_lst.insert(lst);
-	for (auto& str : pro_lst)
-		if (mp.find(str) != mp.end())
-			mp.erase(str);
+	int findCounter = 0;
+	std::string tmpProblemName;
+	std::set<std::string> tmpProblemList;
+	while (std::cin >> tmpProblemName && tmpProblemName != "end")
+		tmpProblemList.insert(tmpProblemName);
+	for (auto& str : tmpProblemList)
+		if (problemList.find(str) != problemList.end())
+		{
+			problemList.erase(str);
+			++findCounter;
+		}
+	std::cout << "total items: " << findCounter << "\n";
 }
-void Manager::del_cata()
+
+void Manager::DeleteCatelogue()
 {
-	std::string lst;
-	std::set<std::string>tag_lst;
-	while (std::cin >> lst && lst != "end")
-		tag_lst.insert(lst);
-	std::vector<std::string>tmp;
-	for (auto& str : mp)
-		if (find_com(tag_lst, str.second))
-			tmp.push_back(str.first);
-	std::cout << "total items: " << tmp.size() << "\n";
-	for (auto& str : tmp)
-		mp.erase(str);
+	std::string tmpTag;
+	std::set<std::string>tmpTagList;
+	while (std::cin >> tmpTag && tmpTag != "end")
+		tmpTagList.insert(tmpTag);
+	std::vector<std::string>tmpDeleteVector;
+	for (auto& str : problemList)
+		if (find_com(tmpTagList, str.second))
+		tmpDeleteVector.push_back(str.first);
+	std::cout << "total items: " << tmpDeleteVector.size() << "\n";
+	for (auto& str : tmpDeleteVector)
+		problemList.erase(str);
 }
-void Manager::del()
+
+void Manager::Delete()
 {
-	std::string op;
-	std::cin >> op;
-	if (op == "-p")
-		del_pro();
-	else if (op == "-c")
-		del_cata();
+	std::string operation;
+	std::cin >> operation;
+	if (operation == "-p")
+		DeleteProblem();
+	else if (operation == "-c")
+		DeleteCatelogue( );
 }
-void Manager::init_mp()
+
+void Manager::initFunctionMap()
 {
-	std::fstream file_ptr("D:\\problemdata\\problemdata.txt", std::ios::in);
-	if (!file_ptr)
+	std::fstream filePointer("D:\\problemdata\\problemdata.txt", std::ios::in);
+	if (!filePointer)
 	{
 		std::cout << "Can't open file\n";
 		std::exit(0);
 	}
 	std::cout << "Initializing\n";
-	std::string pro, lst;
-	int cata_cnt;
-	while (file_ptr >> pro)
+	std::string tmpProblemName, tmpTagList;
+	int catelogueCounter;
+	while (filePointer >> tmpProblemName)
 	{
-		file_ptr >> cata_cnt;
-		while (cata_cnt--)
+		filePointer >> catelogueCounter;
+		while (catelogueCounter--)
 		{
-			file_ptr >> lst;
-			mp[pro].insert(lst);
+			filePointer >> tmpTagList;
+			problemList[tmpProblemName].insert(tmpTagList);
 		}
 	}
 	std::cout << "Initialized\n";
-	file_ptr.close();
+	filePointer.close();
 }
+
 Manager::Manager()
 {
 	std::ios::sync_with_stdio(0);
 	std::cin.tie(0);
-	init_mp();
-	func_mp["-a"] = &Manager::add_pro;
-	func_mp["-q"] = &Manager::query;
-	func_mp["-d"] = &Manager::del;
-	func_mp["-l"] = &Manager::list;
-	func_mp["-c"] = &Manager::clear;
-	func_mp["-s"] = &Manager::save_pro;
+	initFunctionMap();
+	functionMap["-a"] = &Manager::AddProblem;
+	functionMap["-q"] = &Manager::Query;
+	functionMap["-d"] = &Manager::Delete;
+	functionMap["-l"] = &Manager::List;
+	functionMap["-c"] = &Manager::Clear;
+	functionMap["-s"] = &Manager::SaveProblemList;
 }
-void Manager::call_func(std::string& op)
+void Manager::CallFunction(std::string& op)
 {
 
-	auto it = func_mp.find(op);
-	if (it != func_mp.end())
+	auto it = functionMap.find(op);
+	if (it != functionMap.end())
 		(this->*(*it).second)();
 	else if (op != "-e")
 		std::cout << "Error Command!\n";
