@@ -1,14 +1,16 @@
 # problem_manager
 
-## introduce
+## introduction
 
-This is a manager for you to manage the problem or other thing.
+This is a manager for you to manage the problem or other things.
 
 ## usage
 
-Create a txt at you disk whose path is "D:\problemdata\problemdata.txt" before your run it for the first time. 
+The system will create two files when you run it for the first.
 
-The program  will read the file first when you run it.
+One is the direction of your code, the other is the attributions of the problems you saved. 
+
+The system  will read the file first when you run it.
 
 Then you can input commands appending ">>>".
 
@@ -105,10 +107,36 @@ Example:
 
 > -e
 
-Exit the program.
+Exit the system.
 
 Example:
 
 ```
 >>> -e
 ```
+> -o
+
+Open the code by vscode.
+
+Example:
+
+```
+>>> -o
+test1
+test2
+end
+```
+
+Run script file automatically is supported, you can write the same commands to a file and run the file.
+
+> -lc path
+
+Open the script and run it. If there is a command "-e" in your script, the system will be terminated.
+
+Example:
+
+```
+>>> -lc d:\\cmtest
+```
+
+If you want to run commands in your program, function run is overloaded as run(const std::string&), the system will run the string as a script.
