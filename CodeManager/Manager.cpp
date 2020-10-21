@@ -1,8 +1,33 @@
 #include "Manager.h"
 
-bool find_com(std::set<std::string>& firstSet, std::set<std::string>& secondSet)
+std::streambuf* cinPointer = std::cin.rdbuf();
+
+std::string decrypt(const std::string& str, char magicNumber);
+
+int ReadInt(std::istream& is)
+{
+	int tmp;
+	if (!(is >> tmp))
+		throw std::invalid_argument("stream comes to the end");
+	return tmp;
+}
+
+std::string ReadString(std::istream& is)
+{
+	std::string tmp;
+	if (!(is >> tmp))
+		throw std::invalid_argument("stream comes to the end");
+	return tmp;
+}
+
+std::set<std::string> FindIntersection
+(
+	const std::set<std::string>& firstSet, 
+	const std::set<std::string>& secondSet
+)
 {
 	auto it1 = firstSet.begin(), it2 = secondSet.begin();
+	std::set<std::string> s;
 	while (it1 != firstSet.end() && it2 != secondSet.end())
 	{
 		if (*it1 < *it2)
@@ -10,24 +35,72 @@ bool find_com(std::set<std::string>& firstSet, std::set<std::string>& secondSet)
 		else if (*it1 > * it2)
 			++it2;
 		else
-			return true;
+		{
+			s.insert(*it1);
+			++it1;
+			++it2;
+		}
 	}
-	return false;
+	return s;
+}
+
+void ProblemList(const std::pair<std::string, std::set<std::string>>& p, int& count)
+{
+	++count;
+	std::cout << p.first << "\ntag:";
+	for (auto& sstr : p.second)
+		if (sstr[0] > 0)
+			std::cout << " " << sstr;
+	std::cout << "\n";
+}
+
+void Manager::OutputProblemListByCatalogue
+(
+	const std::set<std::string>& s, 
+	int& count
+)
+{
+	for (auto& str : problemList)
+		if (FindIntersection(s, str.second).size())
+			ProblemList(str, count);
+}
+
+void Manager::OutputProblemListByName
+(
+	const std::set<std::string>& s,
+	int& count
+)
+{
+	for (auto& str : s)
+	{
+		auto it = problemList.find(str);
+		if (it != problemList.end())
+			ProblemList(*it, count);
+	}
 }
 
 void Manager::AddProblem()
 {
-	std::string problem, tagList;
+	std::string problem, pathCommand;
 	int catalogueCounter;
 	while (std::cin >> problem && problem != "end")
 	{
-		std::cin >> catalogueCounter;
+		bool isWithPath = 1;
+		std::cin >> pathCommand;
+		if (pathCommand == "-f")
+		{
+			isWithPath = 0;
+			std::cin >> catalogueCounter;
+		}
+		else if (isdigit(pathCommand[0]))
+			catalogueCounter = atoi(pathCommand.c_str());
+		else
+			return void(puts("Not -f or digit, function Terminated!"));
 		problemList[problem] = std::set<std::string>();
 		while (catalogueCounter--)
-		{
-			std::cin >> tagList;
-			problemList[problem].insert(tagList);
-		}
+			problemList[problem].insert(ReadString(std::cin));
+		if (isWithPath)
+			problemList[problem].insert(decrypt(ss, magicNumber) + ReadString(std::cin));
 	}
 }
 
@@ -39,45 +112,25 @@ void Manager::QueryProblem()
 		tmpProblemList.insert(tmpProblemName);
 	std::cout << "searching...\n";
 	int findCounter = 0;
-	for (auto& str : tmpProblemList)
-	{
-		auto it = problemList.find(str);
-		if (it != problemList.end())
-		{
-			++findCounter;
-			std::cout << (*it).first << "\ntag:";
-			for (auto& sstr : (*it).second)
-				std::cout << " " << sstr;
-			std::cout << "\n";
-		}
-	}
+	OutputProblemListByName(tmpProblemList, findCounter);
 	std::cout << "total items: " << findCounter << "\n";
 }
 
 void Manager::QueryCatelogue()
 {
-	int findCounter = 0;
 	std::string tmpTag;
 	std::set<std::string> tmpTagList; 
 	while (std::cin >> tmpTag && tmpTag != "end")
 		tmpTagList.insert(tmpTag);
 	std::cout << "searching...\n";
-	for (auto& str : problemList)
-		if (find_com(tmpTagList, str.second))
-		{
-			std::cout << str.first << "\ntag:";
-			for (auto& sstr : str.second)
-				std::cout << " " << sstr;
-			std::cout << "\n";
-			++findCounter;
-		}
+	int findCounter = 0;
+	OutputProblemListByCatalogue(tmpTagList, findCounter);
 	std::cout << "total items: " << findCounter << "\n";
 }
 
 void Manager::Query()
 {
-	std::string operation;
-	std::cin >> operation;
+	std::string operation = ReadString(std::cin);
 	if (operation == "-p")
 		QueryProblem();
 	else if (operation == "-c")
@@ -88,24 +141,17 @@ void Manager::ListProblem()
 {
 	int findCounter= 0;
 	for (auto& str : problemList)
-	{
-		std::cout << str.first << "\ntag:";
-		for (auto& sstr : str.second)
-		{
-			std::cout << " " << sstr;
-			++findCounter;
-		}
-		std::cout << "\n";
-	}
+		ProblemList(str, findCounter);
 	std::cout << "total items: " << findCounter << "\n";
 }
 
-void Manager::listCatelogue()
+void Manager::ListCatelogue()
 {
 	std::unordered_map<std::string, std::set<std::string>>tmpProblemList;
-	for (auto &dat : problemList)
+	for (auto& dat : problemList)
 		for (auto& str : dat.second)
-			tmpProblemList[str].insert(dat.first);
+			if (str[0] > 0)
+				tmpProblemList[str].insert(dat.first);
 	for (auto& dat : tmpProblemList)
 	{
 		std::cout << dat.first << "\n";
@@ -117,29 +163,26 @@ void Manager::listCatelogue()
 
 void Manager::List()
 {
-	std::string operation;
-	std::cin >> operation;
+	std::string operation = ReadString(std::cin);
 	if (operation == "-p")
 		ListProblem();
 	else if (operation == "-c")
-		listCatelogue();
+		ListCatelogue();
 }
 
 void Manager::Clear()
 {
-	std::string operationCheck;
 	std::cout << "please check y/n: ";
-	std::cin >> operationCheck;
-	if (operationCheck == "y")
-	{
-		problemList.clear();
-		std::cout << "cleared\n";
-	}
+	std::string operationCheck = ReadString(std::cin);
+	if (operationCheck == "n")
+		return;
+	problemList.clear();
+	std::cout << "cleared\n";
 }
 
 void Manager::SaveProblemList()
 {
-	std::fstream filePointer("D:\\problemdata\\problemdata.txt", std::ios::out);
+	std::fstream filePointer("D:\\problemdata\\problemdata", std::ios::out);
 	for (auto& str : problemList)
 	{
 		filePointer << str.first;
@@ -176,8 +219,8 @@ void Manager::DeleteCatelogue()
 		tmpTagList.insert(tmpTag);
 	std::vector<std::string>tmpDeleteVector;
 	for (auto& str : problemList)
-		if (find_com(tmpTagList, str.second))
-		tmpDeleteVector.push_back(str.first);
+		if (FindIntersection(tmpTagList, str.second).size())
+			tmpDeleteVector.push_back(str.first);
 	std::cout << "total items: " << tmpDeleteVector.size() << "\n";
 	for (auto& str : tmpDeleteVector)
 		problemList.erase(str);
@@ -195,11 +238,29 @@ void Manager::Delete()
 
 void Manager::initFunctionMap()
 {
-	std::fstream filePointer("D:\\problemdata\\problemdata.txt", std::ios::in);
+	std::fstream configFilePointer("D:\\problemdata\\config", std::ios::in);
+	if (!configFilePointer)
+	{
+		std::cout << "New User\n";
+		_mkdir("D:\\problemdata");
+		std::cout << "Input the direction that contain your code:\n";
+		std::cin >> fileDirection;
+		std::fstream newConfigFilePointer = std::fstream("D:\\problemdata\\config", std::ios::out);
+		newConfigFilePointer << fileDirection << '\n';
+		newConfigFilePointer.close();
+	}
+	else
+	{
+		configFilePointer >> fileDirection;
+		configFilePointer.close();
+	}
+	std::fstream filePointer("D:\\problemdata\\problemdata", std::ios::in);
 	if (!filePointer)
 	{
-		std::cout << "Can't open file\n";
-		std::exit(0);
+		std::fstream newFilePointer = std::fstream("D:\\problemdata\\problemdata", std::ios::out);
+		newFilePointer.close();
+		std::cout << "problem file initialized\n";
+		return;
 	}
 	std::cout << "Initializing\n";
 	std::string tmpProblemName, tmpTagList;
@@ -208,12 +269,80 @@ void Manager::initFunctionMap()
 	{
 		filePointer >> catelogueCounter;
 		while (catelogueCounter--)
-		{
-			filePointer >> tmpTagList;
-			problemList[tmpProblemName].insert(tmpTagList);
-		}
+			problemList[tmpProblemName].insert(ReadString(filePointer));
 	}
 	std::cout << "Initialized\n";
+	filePointer.close();
+}
+
+
+std::string decrypt(const std::string& str, char magicNumber)
+{
+	std::string res(str);
+	for (auto& ch : res)
+		ch ^= magicNumber;
+	return res;
+}
+void Manager::OpenFileInVSCode()
+{
+	std::string targetFile;
+	while (std::cin >> targetFile && targetFile != "end")
+	{
+		auto pset = problemList.find(targetFile);
+		if (pset == problemList.end())
+		{
+			std::cout << "problem: " << targetFile << " not found\n";
+			continue;
+		}
+		for (auto& iter : (*pset).second)
+			if (iter.size() > 12 && decrypt(iter.substr(0, 12), magicNumber) == ss)
+			{
+				system((std::string("code ") + fileDirection + '\\' + iter.substr(12)).c_str());
+				break;
+			}
+	}
+}
+
+void Manager::RunScript()
+{
+	std::string str;
+	bool isComment = 0;
+	while (std::cin >> str)
+	{
+		if (str[0] == '#')
+		{
+			isComment ^= 1;
+			continue;
+		}
+		if (isComment)
+			continue;
+		try {
+			CallFunction(str);
+		}
+		catch (const std::string& exceptionStr) {
+			throw exceptionStr;
+		}
+	}
+}
+
+void Manager::LoadCommandFile()
+{
+	std::string filePath = ReadString(std::cin);
+	std::ifstream filePointer(filePath.c_str(), std::ios::in);
+	if(!filePointer)
+		return void(puts("Can't open command file"));
+	auto ptr = std::cin.rdbuf(filePointer.rdbuf());
+	try {
+		RunScript();
+	}
+	catch (const std::string& exceptionStr) {
+		std::cin.rdbuf(ptr);
+		filePointer.close();
+		std::cout << "found \"-e\" in script file: " << filePath << "\n";
+		throw exceptionStr;
+	}
+	std::cout << "Run script file: " << filePath << " ok!\n";
+	std::cin.rdbuf(ptr);
 	filePointer.close();
 }
 
@@ -228,13 +357,56 @@ Manager::Manager()
 	functionMap["-l"] = &Manager::List;
 	functionMap["-c"] = &Manager::Clear;
 	functionMap["-s"] = &Manager::SaveProblemList;
+	functionMap["-o"] = &Manager::OpenFileInVSCode;
+	functionMap["-lc"] = &Manager::LoadCommandFile;
 }
-void Manager::CallFunction(std::string& op)
-{
 
+void Manager::CallFunction(const std::string& op)
+{
+	if (op == "-e")
+		throw op;
 	auto it = functionMap.find(op);
-	if (it != functionMap.end())
+	if (it == functionMap.end())
+		throw op;
+	try {
 		(this->*(*it).second)();
-	else if (op != "-e")
-		std::cout << "Error Command!\n";
+	}
+	catch (const std::string& exceptionStr) {
+		throw exceptionStr;
+	}
+}
+
+void Manager::Run(const std::string& script)
+{
+	std::stringstream sstr;
+	sstr << script;
+	auto ptr = std::cin.rdbuf(sstr.rdbuf());
+	std::string op;
+	while (std::cin >> op)
+	{
+		try {
+			CallFunction(op);
+		}
+		catch (const std::string& exceptionStr) {
+			if (exceptionStr == "-e")
+				break;
+		}
+	}
+	std::cin.rdbuf(ptr);
+	std::cout << "Run script string ok!\n";
+}
+
+void Manager::Run()
+{
+	while (1)
+	{
+		std::cout << ">>> ";
+		try {
+			CallFunction(ReadString(std::cin));
+		}
+		catch (const std::string& exceptionStr) {
+			if (exceptionStr == "-e")
+				break;
+		}
+	}
 }
