@@ -22,6 +22,8 @@ Add a problem in the style: "problem_name number_of_tag tag_1 tag_2 ... tag_n".
 
 You can query more than one problem like the example.
 
+if you add "-f" before the number_of_tag, you should input number_of_tag + 1 strings, and the last one is 
+
 Example:
 
 ```
@@ -126,6 +128,9 @@ test1
 test2
 end
 ```
+## What's New
+
+### script file supported
 
 Run script file automatically is supported, you can write the same commands to a file and run the file.
 
@@ -138,5 +143,7 @@ Example:
 ```
 >>> -lc d:\\cmtest
 ```
+
+### script string supported
 
 If you want to run commands in your program, function run is overloaded as run(const std::string&), the system will run the string as a script.
