@@ -22,14 +22,16 @@ Add a problem in the style: "problem_name number_of_tag tag_1 tag_2 ... tag_n".
 
 You can query more than one problem like the example.
 
-if you add "-f" before the number_of_tag, you should input number_of_tag + 1 strings, and the last one is 
+if you add "-f" before the number_of_tag, you should input number_of_tag + 1 strings, and the last one is the relative path.
+
+see example "test2" in detailed.
 
 Example:
 
 ```
 >>> -a
 test1 4 t1 t2 t3 t4
-test2 2 t1 t2
+test2 -f 2 t1 t2 test2.cpp
 end
 ```
 
